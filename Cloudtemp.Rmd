@@ -104,12 +104,49 @@ From this head() function we can see "elevation" was loaded and incorporated suc
 ```{r, warning = FALSE}
 
 #transform value to numeric for qplot
-clouddata[,1:7]= as.numeric(as.character(unlist(clouddata[,1:7])))
+clouddata[,1:6]= as.numeric(as.character(unlist(clouddata[,1:6])))
 
 #use ggplot to make the graph
 library(ggplot2)
-qplot(data = clouddata, x = clouddata$temperature, y = clouddata$pressure, color = clouddata$cloudlow, main = "Pressure vs Temperature With Percent of Low Clouds" ) + scale_color_gradient(low = "blue", high = "red")
+qplot(data = clouddata, x = clouddata$temperature, y = clouddata$pressure, color = clouddata$cloudlow, main = "Pressure vs Temperature With Percent of Low Clouds", xlab = "Temperature", ylab = "Pressure" ) + scale_color_gradient(low = "blue", high = "red")
+
 
 
 ```
+
+Display the average value for pressure on a map.
+
+```{r, warning = FALSE, message= FALSE}
+
+clouddata$lat = as.character(clouddata$lat)
+clouddata$lat = substr(clouddata$lat,1,nchar(clouddata$lat)-1)
+clouddata$lat = as.numeric(clouddata$lat)
+
+clouddata$long = as.character(clouddata$long)
+clouddata$long = substr(clouddata$long,1,nchar(clouddata$long)-1)
+clouddata$long = as.numeric(clouddata$long)
+
+
+
+pm = with(clouddata, by(clouddata$pressure, list(-long, lat), mean))
+
+dn = dimnames(pm)
+x = as.numeric(dn[[1]])
+y = as.numeric(dn[[2]])
+
+image(x, y, pm, xlab = "longitude", ylab = "latitude")
+
+library(maps)
+map(xlim = range(x),  ylim = range(y), add = TRUE)
+
+
+
+
+```
+
+
+
+
+
+
 
